@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>ClimaHora — Hora y Clima Mundial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./climahora.css" />
+
+  <!-- ══ PWA META TAGS ══ -->
+  <meta name="application-name" content="ClimaHora" />
+  <meta name="description" content="Consulta el clima y la hora local de cualquier ciudad del mundo." />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="ClimaHora" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>" />
+
+  <style>
+    body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+    html.dark { background: #0d1117; }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-pulse"></div>
+        <div class="brand-text">
+          <span class="brand-name">ClimaHora</span>
+          <span class="brand-sub" id="brandSub">Hora &amp; Clima Mundial</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- TOGGLE MODO OSCURO -->
+        <button id="darkToggleBtn" class="dark-toggle-btn" aria-label="Activar modo oscuro" title="Modo oscuro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+          </svg>
+        </button>
+
+        <!-- SELECTOR DE IDIOMA -->
+        <div class="lang-selector">
+          <button class="lang-btn" id="langBtn" onclick="toggleLangMenu()" aria-label="Seleccionar idioma">
+            <span class="lang-flag">🇪🇸</span>
+            <span class="lang-label">ES</span>
+            <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <ul class="lang-menu" id="langMenu">
+            <li class="lang-option lang-option--active" data-code="es" onclick="seleccionarIdioma('es')">
+              <span class="lang-opt-flag">🇪🇸</span><span class="lang-opt-name">Español</span><span class="lang-opt-code">ES</span>
+            </li>
+            <li class="lang-option" data-code="en" onclick="seleccionarIdioma('en')">
+              <span class="lang-opt-flag">🇺🇸</span><span class="lang-opt-name">English</span><span class="lang-opt-code">EN</span>
+            </li>
+            <li class="lang-option" data-code="fr" onclick="seleccionarIdioma('fr')">
+              <span class="lang-opt-flag">🇫🇷</span><span class="lang-opt-name">Français</span><span class="lang-opt-code">FR</span>
+            </li>
+            <li class="lang-option" data-code="pt" onclick="seleccionarIdioma('pt')">
+              <span class="lang-opt-flag">🇧🇷</span><span class="lang-opt-name">Português</span><span class="lang-opt-code">PT</span>
+            </li>
+            <li class="lang-option" data-code="zh" onclick="seleccionarIdioma('zh')">
+              <span class="lang-opt-flag">🇨🇳</span><span class="lang-opt-name">中文</span><span class="lang-opt-code">ZH</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <div class="hero">
+      <p class="hero-text">Así está el clima en<br><span class="hero-accent" id="heroCity">. . .</span></p>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="search-group">
+      <div class="search-wrap" id="searchWrap">
+        <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          id="cityInput"
+          class="search-input"
+          placeholder="Ciudad, País…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="searchBtn" class="search-btn" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+      <ul class="autocomplete-list" id="autocompleteList"></ul>
+    </div>
+
+    <!-- ESTADO / ERROR -->
+    <p id="estado" class="estado"></p>
+
+    <!-- RESULTADO -->
+    <div id="result" class="result-area"></div>
+
+    <!-- HISTORIAL -->
+    <div id="history" class="history-area"></div>
+
+    <!-- TAGLINE -->
+    <p class="tagline" id="tagline">— Accesible, cómoda y siempre al día —</p>
+
+  </div>
+
+  <!-- TEMPLATE RESULTADO -->
+  <template id="tpl-result">
+    <div class="card">
+      <div class="card-top">
+        <div class="flag-wrap" id="flagWrap">
+          <img id="flagImg" class="flag-img" src="" alt="" />
+        </div>
+        <div class="card-location">
+          <h2 class="card-city" id="cardCity"></h2>
+          <span class="card-country" id="cardCountry"></span>
+        </div>
+        <span id="weatherEmoji" class="weather-emoji"></span>
+      </div>
+
+      <div class="temp-section">
+        <div class="temp-block">
+          <span class="temp-value" id="tempValue"></span>
+          <div class="temp-unit-group">
+            <span class="temp-unit" id="tempUnitLabel">°C</span>
+            <button class="temp-unit-toggle" id="tempUnitToggle" aria-label="Cambiar unidad">°F</button>
+          </div>
+        </div>
+        <div class="temp-meta">
+          <span class="weather-desc" id="weatherDesc"></span>
+          <span class="temp-feels" id="tempFeels"></span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">💧</span>
+          <span class="stat-label" id="statHumidityLabel">Humedad</span>
+          <span class="stat-value" id="statHumidityValue">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💨</span>
+          <span class="stat-label" id="statWindLabel">Viento</span>
+          <span class="stat-value" id="statWindValue">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🌡️</span>
+          <span class="stat-label" id="statMinMaxLabel">Mín / Máx</span>
+          <span class="stat-value" id="statMinMaxValue">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">☁️</span>
+          <span class="stat-label" id="statCloudsLabel">Nubosidad</span>
+          <span class="stat-value" id="statCloudsValue">—</span>
+        </div>
+      </div>
+
+      <div class="sun-row">
+        <div class="sun-item">
+          <span class="sun-icon">🌅</span>
+          <span class="sun-label" id="sunriseLabel">Amanecer</span>
+          <span class="sun-value" id="sunriseValue">—</span>
+        </div>
+        <div class="sun-divider"></div>
+        <div class="sun-item">
+          <span class="sun-icon">🌇</span>
+          <span class="sun-label" id="sunsetLabel">Atardecer</span>
+          <span class="sun-value" id="sunsetValue">—</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="clock-section">
+        <div class="clock-header">
+          <div class="clock-label" id="clockLabel">Hora local</div>
+          <button class="fmt-toggle-btn" id="fmtToggleBtn">12h</button>
+        </div>
+        <div class="clock-row">
+          <div class="analog-clock" id="analogClock">
+            <svg viewBox="0 0 100 100" class="clock-svg">
+              <circle cx="50" cy="50" r="48" class="clock-face"/>
+              <circle cx="50" cy="50" r="44" class="clock-inner"/>
+              <g id="clockTicks"></g>
+              <line id="hourHand"   x1="50" y1="50" x2="50" y2="24" class="hand hour-hand"/>
+              <line id="minuteHand" x1="50" y1="50" x2="50" y2="16" class="hand minute-hand"/>
+              <line id="secondHand" x1="50" y1="56" x2="50" y2="13" class="hand second-hand"/>
+              <circle cx="50" cy="50" r="3.5" class="clock-center"/>
+              <circle cx="50" cy="50" r="1.5" class="clock-center-dot"/>
+            </svg>
+          </div>
+          <div class="digital-block">
+            <div class="digital-time" id="digitalTime"></div>
+            <div class="digital-ampm" id="digitalAmpm"></div>
+            <div class="digital-date" id="digitalDate"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="map-section">
+        <div class="map-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+          <span class="map-label" id="mapLabel">Ubicación</span>
+        </div>
+        <div class="map-wrap">
+          <iframe id="mapFrame" class="map-frame" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <a id="mapLink" class="map-open-btn" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span id="mapLinkText">Ver en OpenStreetMap</span>
+        </a>
+      </div>
+    </div>
+  </template>
+
+  <!-- TEMPLATE HISTORIAL -->
+  <template id="tpl-history">
+    <div class="history-section">
+      <div class="history-header">
+        <span class="history-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/>
+          </svg>
+          <span id="historyTitle">Recientes</span>
+        </span>
+        <button id="clearHistory" class="clear-btn">Limpiar</button>
+      </div>
+      <ul class="history-list" id="historyList"></ul>
+    </div>
+  </template>
+
+  <script src="./climahora.js"></script>
+
+  <!-- ══ SERVICE WORKER ══ -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then(r => console.log("[ClimaHora PWA] SW:", r.scope))
+          .catch(e => console.warn("[ClimaHora PWA] SW error:", e));
+      });
+    }
+  </script>
+
+</body>
+</html>

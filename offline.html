@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClimaHora — Sin conexión</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f6f4f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .container {
+      text-align: center;
+      max-width: 340px;
+    }
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+    h1 {
+      font-family: system-ui, sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 0.9rem;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .btn {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="icon">🌐</span>
+    <h1>Sin conexión</h1>
+    <p>ClimaHora necesita internet para consultar el clima y la hora en tiempo real. Conéctate a una red y vuelve a intentarlo.</p>
+    <a class="btn" href="./index.html">Reintentar</a>
+  </div>
+</body>
+</html>
