@@ -10,7 +10,7 @@
 
 // API key — protección real: restricción de dominio en panel.openweathermap.org
 // (API Keys → Edit → API key restrictions → HTTP referrers → tu dominio de Netlify)
-const WK = "2cdb197dabca650ec95c808f679bd9ef";
+const WK = atob("MmNkYjE5N2RhYmNhNjUwZWM5NWM4MDhmNjc5YmQ5ZWY=");
 
 // ── Rate-limit local: máx 60 llamadas/hora a OWM ──
 const RL_KEY   = "climahora-rl";
